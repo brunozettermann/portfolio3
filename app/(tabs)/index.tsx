@@ -1,70 +1,114 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  Alert, 
+  StyleSheet 
+} from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const SignupScreen = () => {
+  const [username, setUsername] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPassword, setUserPassword] = useState('');
 
-export default function HomeScreen() {
+  const registerUser = async () => {
+    if (!username || !userEmail || !userPassword) {
+      Alert.alert('Erro', 'Todos os campos são obrigatórios.');
+      return;
+    }
+
+    const userData = { name: username, email: userEmail, password: userPassword };
+
+    try {
+      const result = await fetch('https://taskhub-s37f.onrender.com/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (result.ok) {
+        Alert.alert('Sucesso', 'Você foi cadastrado com sucesso!');
+      } else {
+        Alert.alert('Erro', 'Erro ao tentar cadastrar. Tente novamente.');
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Erro de conexão. Verifique sua internet.');
+    }
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.wrapper}>
+      <Text style={styles.header}>Criar Conta</Text>
+
+      <TextInput
+        style={styles.inputBox}
+        placeholder="Nome Completo"
+        value={username}
+        onChangeText={setUsername}
+      />
+
+      <TextInput
+        style={styles.inputBox}
+        placeholder="E-mail"
+        value={userEmail}
+        onChangeText={setUserEmail}
+        keyboardType="email-address"
+      />
+
+      <TextInput
+        style={styles.inputBox}
+        placeholder="Senha"
+        value={userPassword}
+        onChangeText={setUserPassword}
+        secureTextEntry
+      />
+
+      <TouchableOpacity 
+        style={styles.submitButton} 
+        onPress={registerUser}
+      >
+        <Text style={styles.submitButtonText}>Cadastrar</Text>
+      </TouchableOpacity>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  wrapper: {
+    flex: 1,
+    padding: 16,
+    paddingTop: 40, 
+    backgroundColor: '#f2f2f2',
+  },
+  header: {
+    fontSize: 24, 
+    marginBottom: 20, 
+    textAlign: 'center',
+    color: '#333',
+  },
+  inputBox: {
+    height: 40,  
+    borderColor: '#bbb',
+    borderWidth: 1,
+    marginBottom: 10, 
+    paddingLeft: 8,
+    backgroundColor: '#fff',
+  },
+  submitButton: {
+    height: 40,  
+    backgroundColor: '#28a745',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16, 
   },
 });
+
+export default SignupScreen;
